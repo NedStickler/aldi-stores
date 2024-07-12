@@ -9,7 +9,16 @@ if __name__ == "__main__":
 
     directory_items = driver.find_elements(By.CLASS_NAME, "Directory-listLink")
 
+    stores = []
     locations = []
     for item in directory_items:
-        locations.append(item.get_attribute("href"))
-    print(locations)
+        if int(item.get_attribute("data-count")[1:-1]) == 1:
+            stores.append(item.get_attribute("href"))
+        else:
+            locations.append(item.get_attribute("href"))
+    
+    for location in locations:
+        driver.get(location)
+        location_stores = driver.find_elements(By.CLASS_NAME, "Teaser-button")
+        for location_store in location_stores:
+            stores.append(location_store.get_attribute("href"))
