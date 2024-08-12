@@ -1,31 +1,42 @@
 
 import requests
-from selenium import webdriver
-from selenium.webdriver.common.by import By
 from bs4 import BeautifulSoup
 
 # TODO:
 # - Automated analysis of robots.txt
 
 if __name__ == "__main__":
-    driver = webdriver.Chrome()
-    driver.get("https://www.tesco.com/store-locator/directory")
+    root = "https://stores.aldi.co.uk/"
+    res = requests.get(root)
 
-    stores_and_areas = driver.find_elements(By.CLASS_NAME, "Directory-listLink")
-    stores = []
+    # Find regions
+    soup = BeautifulSoup(res.text, "html.parser")
+    regions_html = soup.find_all(class_="Directory-listLink")
+    regions = [root + region.get("href") for region in regions_html]
+    
+    # Parse area and store links
     areas = []
-
-    # Sort stores and areas
-    for item in stores_and_areas:
-        if int(item.get_attribute("data-count")[1:-1]) == 1:
-            stores.append(item.get_attribute("href"))
-        else:
-            areas.append(item.get_attribute("href"))
-
-    for area in areas:
-        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"}
-        res = requests.get(area, headers=headers)
+    stores = []
+    for region in regions:
+        res = requests.get(region)
         soup = BeautifulSoup(res.text, "html.parser")
-        area_stores = soup.find_all(class_="Teaser-button")
-        for area_store in area_stores:
-            stores.append("https://www.tesco.com/store-locator" + area_store.get("href"))
+        areas_and_stores = soup.find_all(class_="Directory-listLink")
+
+        for area_or_store in areas_and_stores:
+            store_count = int(area_or_store.get("data-count")[1:-1]) # data-count is wrapped in brackets, hence the slice
+            if store_count > 1:
+                areas.append(root + area_or_store.get("href"))
+            elif store_count == 1:
+                stores.append(root + area_or_store.get("href"))
+            else:
+                raise ValueError("data-count HTML tag attribute is not greater than or equal to 1.")
+    
+    # Parse areas further
+    for area in areas:
+        res = requests.get(area)
+        soup = BeautifulSoup(res.text, "html.parser")
+        stores_in_area = soup.find_all(class_="Teaser-titleLink")
+        for store in stores_in_area:
+            stores.append(root + store.get("href")[3:]) # href includes preceding '../', hence the slice
+    print()
+
