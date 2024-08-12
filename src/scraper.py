@@ -38,5 +38,25 @@ if __name__ == "__main__":
         stores_in_area = soup.find_all(class_="Teaser-titleLink")
         for store in stores_in_area:
             stores.append(root + store.get("href")[3:]) # href includes preceding '../', hence the slice
-    print()
 
+    # Parse store information
+    stores_with_info = []
+    for store in stores:
+        res = requests.get(store)
+        soup = BeautifulSoup(res.text, "html.parser")
+
+        store_name = soup.find(id="location-name").text
+        address_line_one = soup.find(class_="Address-line1").text
+        address_area = soup.find(class_="Address-city").text
+        address_postcode = soup.find(class_="Address-postalCode").text
+        full_address = address_line_one + ", " + address_area + ", " + address_postcode 
+
+        stores_with_info.append([{
+            "name": store_name,
+            "full_address": full_address,
+            "address_line_one": address_line_one,
+            "address_area": address_area,
+            "address_postcode": address_postcode,
+            "url": store
+        }])
+        
