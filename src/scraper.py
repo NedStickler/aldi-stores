@@ -1,6 +1,7 @@
 
 import requests
 import json
+import pandas as pd
 from bs4 import BeautifulSoup
 
 
@@ -98,5 +99,7 @@ if __name__ == "__main__":
         store_info.update(formatted_hours)
         stores_with_info.append(store_info)
 
+    # Save
     with open("./data/scraped_stores.json", "w") as f:
         json.dump(stores_with_info, f)
+    pd.json_normalize(stores_with_info).to_csv("./data/scraped_stores.csv")
