@@ -44,7 +44,6 @@ if __name__ == "__main__":
         for store in stores_in_area:
             stores.append(root + store.get("href")[3:]) # href includes preceding '../', hence the slice
 
-    count = 0
     # Parse store information
     stores_with_info = []
     for store in stores:
