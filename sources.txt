@@ -1,0 +1,5 @@
+Household Income England and Wales: https://www.gov.scot/collections/local-level-household-income-estimates/
+Middle-Layer Super Output Area Boundaries: https://geoportal.statistics.gov.uk/search?q=BDY_MSOA%20DEC_2021&sort=Title%7Ctitle%7Casc
+
+Household Income Scotland: https://www.gov.scot/collections/local-level-household-income-estimates/
+Scottish Local Authority Boundaries: https://data.spatialhub.scot/dataset/local_authority_boundaries-is
